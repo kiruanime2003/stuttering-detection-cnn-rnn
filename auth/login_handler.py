@@ -20,3 +20,4 @@ def register_user(conn, email, password, role):
         text("INSERT INTO user_list (email, password, role) VALUES (:e, :p, :r)"),
         {"e": email, "p": password, "r": role}
     )
+    conn.commit()
