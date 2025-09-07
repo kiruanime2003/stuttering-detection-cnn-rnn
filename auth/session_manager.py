@@ -1,7 +1,7 @@
 import streamlit as st
 
 def login_user(email, role):
-    st.session_state["email"] = email
+    st.session_state["user_email"] = email
     st.session_state["role"] = role
     st.session_state["logged_in"] = True
 
