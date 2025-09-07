@@ -26,23 +26,23 @@ def render():
         if st.button("❌ Close"):
             st.session_state.show_form = False
 
+    # Resolve therapist_id
+    therapist_id = None
+    current_email = st.session_state.get("user_email")
+    if current_email:
+        with engine.connect() as conn:
+            result = conn.execute(
+                text("SELECT user_id FROM user_list WHERE email = :email"),
+                {"email": current_email}
+            )
+            therapist_row = result.fetchone()
+            therapist_id = therapist_row[0] if therapist_row else None
+    else:
+        st.warning("No user email found in session. Please log in.")
+
+    # Add child form
     if st.session_state.show_form:
-        # Resolve therapist_id
-        therapist_id = None
-        current_email = st.session_state.get("user_email")
-        if current_email:
-            with engine.connect() as conn:
-                result = conn.execute(
-                    text("SELECT user_id FROM user_list WHERE email = :email"),
-                    {"email": current_email}
-                )
-                therapist_row = result.fetchone()
-                therapist_id = therapist_row[0] if therapist_row else None
-        else:
-            st.warning("No user email found in session. Please log in.")
-
         st.markdown("### Add New Child Profile")
-
         with st.form("new_child_form"):
             st.text_input("Therapist ID", value=str(therapist_id), disabled=True)
             full_name = st.text_input("Full Name")
@@ -80,3 +80,35 @@ def render():
 
                 except Exception as e:
                     st.error(f"❌ Insert failed: {e}")
+
+    # Show child cards
+    if therapist_id:
+        
+        with engine.connect() as conn:
+            result = conn.execute(text("""
+                SELECT child_id, full_name, age, recent_visit_date 
+                FROM child_list
+                WHERE therapist_id = :therapist_id
+                ORDER BY recent_visit_date DESC
+            """), {"therapist_id": therapist_id})
+
+            children = result.fetchall()
+
+        if children:
+            cols = st.columns(3)  # grid with 3 columns
+            for idx, child in enumerate(children):
+                with cols[idx % 3]:  # place in grid
+                    st.markdown(
+                        f"""
+                        <div style="border:1px solid #ccc; border-radius:10px; padding:15px; margin:10px;
+                                    box-shadow:2px 2px 5px rgba(0,0,0,0.1)">
+                            <h4>{child.full_name}</h4>
+                            <p><b>Child ID:</b> {child.child_id}</p>
+                            <p><b>Age:</b> {child.age}</p>
+                            <p><b>Last Visit:</b> {child.recent_visit_date}</p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+        else:
+            st.info("No children added yet.")
