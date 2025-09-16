@@ -72,8 +72,7 @@ def render():
                             "place": place
                         })
 
-                        # Get the newly generated child_id
-                        new_child_id = result.lastrowid  
+                        new_child_id = result.lastrowid
 
                     st.success(f"✅ Child profile added successfully! (Child ID: {new_child_id})")
                     st.session_state.show_form = False
@@ -83,7 +82,6 @@ def render():
 
     # Show child cards
     if therapist_id:
-        
         with engine.connect() as conn:
             result = conn.execute(text("""
                 SELECT child_id, full_name, age, recent_visit_date 
@@ -95,17 +93,24 @@ def render():
             children = result.fetchall()
 
         if children:
-            cols = st.columns(3)  # grid with 3 columns
+            cols = st.columns(3)
             for idx, child in enumerate(children):
-                with cols[idx % 3]:  # place in grid
+                with cols[idx % 3]:
+                    try:
+                        formatted_date = datetime.strptime(
+                            str(child.recent_visit_date), "%Y-%m-%d %H:%M:%S"
+                        ).strftime("%d %b %Y")  # e.g., 23 Sep 2025
+                    except:
+                        formatted_date = str(child.recent_visit_date)
+
                     st.markdown(
                         f"""
-                        <div style="border:1px solid #ccc; border-radius:10px; padding:15px; margin:10px;
+                        <div style="border:1px solid #ccc; border-radius:10px; padding:200px; margin:10px;
                                     box-shadow:2px 2px 5px rgba(0,0,0,0.1)">
                             <h4>{child.full_name}</h4>
                             <p><b>Child ID:</b> {child.child_id}</p>
                             <p><b>Age:</b> {child.age}</p>
-                            <p><b>Last Visit:</b> {child.recent_visit_date}</p>
+                            <p><b>Last Visit:</b> {formatted_date}</p>
                         </div>
                         """,
                         unsafe_allow_html=True
