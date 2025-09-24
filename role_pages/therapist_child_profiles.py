@@ -171,37 +171,45 @@ def render():
                     except:
                         formatted_date = str(child.recent_visit_date)
 
-                    # Render card with embedded Streamlit button styled as icon
-                    st.markdown(
-                        f"""
-                        <style>
-                        #{button_key} {{
-                            position: absolute;
-                            top: 10px;
-                            right: 10px;
-                            display: none;
-                            background: none;
-                            border: none;
-                            font-size: 18px;
-                            color: #444;
-                        }}
-                        .card-container:hover #{button_key} {{
-                            display: block;
-                        }}
-                        </style>
-                        <div class="card-container" style="position:relative;">
-                            <h4 style="margin: 0;">{child.full_name}</h4>
+                    # Card container
+                    with st.container():
+                        st.markdown("""
+                            <style>
+                            .card-style {
+                                border: 1px solid #ccc;
+                                border-radius: 10px;
+                                padding: 15px;
+                                margin: 10px 0;
+                                box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+                                transition: box-shadow 0.3s ease;
+                            }
+                            .card-style:hover {
+                                box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+                            }
+                            </style>
+                        """, unsafe_allow_html=True)
+
+                        st.markdown('<div class="card-style">', unsafe_allow_html=True)
+
+                        # Header row: name + edit button
+                        name_col, icon_col = st.columns([5, 1])
+                        with name_col:
+                            st.markdown(f"#### {child.full_name}")
+                        with icon_col:
+                            if st.button("✏️", key=button_key):
+                                edit_child_form(child)
+
+                        # Card details
+                        st.markdown(f"""
                             <p><b>Child ID:</b> {child.child_id}</p>
                             <p><b>Age:</b> {child.age}</p>
                             <p><b>Last Visit:</b> {formatted_date}</p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                        """, unsafe_allow_html=True)
 
-                    # Streamlit button styled as pencil icon
-                    if st.button("✏️", key=button_key):
-                        edit_child_form(child)
+                        st.markdown('</div>', unsafe_allow_html=True)
+
+
+
 
 
 
