@@ -178,10 +178,9 @@ def render():
                             .card-style {
                                 border: 1px solid #ccc;
                                 border-radius: 10px;
-                                padding: 15px;
+                                padding: 3px;
                                 margin: 10px 0;
-                                box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-                                transition: box-shadow 0.3s ease;
+                                background-color: #fff
                             }
                             .card-style:hover {
                                 box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
