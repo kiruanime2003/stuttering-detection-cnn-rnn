@@ -130,7 +130,7 @@ def render():
         .card-container:hover {
             box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
         }
-        .edit-button {
+        .edit-icon {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -140,7 +140,7 @@ def render():
             font-size: 18px;
             cursor: pointer;
         }
-        .card-container:hover .edit-button {
+        .card-container:hover .edit-icon {
             display: block;
         }
         </style>
@@ -159,24 +159,52 @@ def render():
             children = result.fetchall()
 
         if children:
-            cols = st.columns(3)
             for idx, child in enumerate(children):
                 if idx % 3 == 0:
                     cols = st.columns(3)
                 with cols[idx % 3]:
+                    button_key = f"edit_{child.child_id}"
+
+                    # Format date
+                    try:
+                        formatted_date = datetime.strptime(str(child.recent_visit_date), "%Y-%m-%d %H:%M:%S").strftime("%d %b %Y")
+                    except:
+                        formatted_date = str(child.recent_visit_date)
+
+                    # Render card with embedded Streamlit button styled as icon
                     st.markdown(
                         f"""
-                        <div class="card-container">
+                        <style>
+                        #{button_key} {{
+                            position: absolute;
+                            top: 10px;
+                            right: 10px;
+                            display: none;
+                            background: none;
+                            border: none;
+                            font-size: 18px;
+                            color: #444;
+                        }}
+                        .card-container:hover #{button_key} {{
+                            display: block;
+                        }}
+                        </style>
+                        <div class="card-container" style="position:relative;">
                             <h4 style="margin: 0;">{child.full_name}</h4>
                             <p><b>Child ID:</b> {child.child_id}</p>
                             <p><b>Age:</b> {child.age}</p>
-                            <p><b>Last Visit:</b> {child.recent_visit_date}</p>
+                            <p><b>Last Visit:</b> {formatted_date}</p>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
-                    if st.button("✏️ Edit", key=f"edit_{child.child_id}"):
+
+                    # Streamlit button styled as pencil icon
+                    if st.button("✏️", key=button_key):
                         edit_child_form(child)
 
-                    else:
-                        st.info("No children added yet.")
+
+
+                    
+        else:
+            st.info("No children added yet.")
