@@ -54,6 +54,27 @@ def show_child_form(therapist_id):
                 except Exception as e:
                     st.error(f"❌ Insert failed: {e}")
 
+@st.dialog("Delete Child Profile?")
+def delete_child_dialog(child):
+    st.markdown(f"### Are you sure you want to delete?")
+    st.markdown("⚠️ This action cannot be undone.")
+
+    confirm, cancel = st.columns([1, 1])
+    with confirm:
+        if st.button("✅ Confirm Delete", key=f"confirm_delete_{child.child_id}"):
+            try:
+                with engine.begin() as conn:
+                    conn.execute(text("DELETE FROM child_list WHERE child_id = :child_id"), {
+                        "child_id": child.child_id
+                    })
+                st.success("✅ Child profile deleted successfully!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"❌ Deletion failed: {e}")
+    with cancel:
+        st.button("❌ Cancel", key=f"cancel_delete_{child.child_id}")
+
+
 # Dialog for editing an existing child
 @st.dialog("Edit Child Profile")
 def edit_child_form(child):
@@ -191,26 +212,26 @@ def render():
                         st.markdown('<div class="card-style">', unsafe_allow_html=True)
 
                         # Header row: name + edit button
-                        name_col, icon_col = st.columns([5, 1])
+                        name_col, icon_col, del_col = st.columns([5, 1, 1])
                         with name_col:
                             st.markdown(f"#### {child.full_name}")
                         with icon_col:
-                            if st.button("✏️", key=button_key):
+                            if st.button("✏️", key=f"edit_{child.child_id}"):
                                 edit_child_form(child)
+                        with del_col:
+                            if st.button("❌", key=f"delete_{child.child_id}"):
+                                delete_child_dialog(child)
+
+
 
                         # Card details
                         st.markdown(f"""
                             <p><b>Child ID:</b> {child.child_id}</p>
                             <p><b>Age:</b> {child.age}</p>
-                            <p><b>Last Visit:</b> {formatted_date}</p>
+                            
                         """, unsafe_allow_html=True)
 
                         st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
 
                     
         else:
