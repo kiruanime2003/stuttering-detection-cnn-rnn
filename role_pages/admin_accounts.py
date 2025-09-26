@@ -19,9 +19,18 @@ def render():
         except Exception as e:
             st.error(f"Error fetching data: {e}")
             return pd.DataFrame()
+        
+    def fetch_child_list():
+        try:
+            query = "SELECT * FROM child_list"
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            st.error(f"Error fetching data: {e}")
+            return pd.DataFrame()
 
     st.set_page_config(page_title="User List Viewer", layout="wide")
-    st.title("👥 User List Table")
+    st.title("User List Table")
 
     user_df = fetch_user_list()
 
@@ -29,3 +38,13 @@ def render():
         st.dataframe(user_df, use_container_width=True)
     else:
         st.warning("No data found in the user_list table.")
+
+    st.set_page_config(page_title="Child List Viewer", layout="wide")
+    st.title("Child List Table")
+
+    child_df = fetch_child_list()
+
+    if not child_df.empty:
+        st.dataframe(child_df, use_container_width=True)
+    else:
+        st.warning("No data found in the child_list table.")
