@@ -5,6 +5,7 @@ import streamlit as st
 from sqlalchemy import create_engine
 import os, urllib.parse
 from dotenv import load_dotenv
+import re
 
 # DB setup
 load_dotenv()
@@ -58,14 +59,23 @@ if not st.session_state.get("logged_in"):
             st.warning("New account will be created.")
             role = st.selectbox("Select role", ("Admin", "Therapist", "Parent"))
             password = st.text_input("Create Password", type="password")
+            def is_valid_email(email):
+                pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+                return re.match(pattern, email)
+
             if st.button("Register"):
-                with engine.begin() as conn:
-                    register_user(conn, email, password, role)
-                    login_user(email, role)
-                    st.session_state.logged_in = True
-                    st.session_state.role = role
-                    st.success("Account created!")
-                    st.rerun()  # ← rerun to hide registration form
+                if not is_valid_email(email):
+                    st.error("❌ Invalid email format. Please enter a valid email address.")
+                elif not password:
+                    st.error("❌ Password cannot be empty.")
+                else:
+                    with engine.begin() as conn:
+                        register_user(conn, email, password, role)
+                        login_user(email, role)
+                        st.session_state.logged_in = True
+                        st.session_state.role = role
+                        st.success("Account created!")
+                        st.rerun()
 
 
 # Role-based navigation
