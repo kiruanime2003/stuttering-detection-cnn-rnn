@@ -26,7 +26,7 @@ role_pages = {
         "Child profiles": "therapist_child_profiles"
     },
     "Parent": {
-        "Dashboard": "parent"
+        "Sessions": "parent_sessions"
     }
 }
 

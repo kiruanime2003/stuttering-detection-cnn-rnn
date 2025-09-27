@@ -17,7 +17,7 @@ def render():
             df = pd.read_sql(query, engine)
             return df
         except Exception as e:
-            st.error(f"Error fetching data: {e}")
+            st.error(f"Error fetching user_list: {e}")
             return pd.DataFrame()
         
     def fetch_child_list():
@@ -26,25 +26,37 @@ def render():
             df = pd.read_sql(query, engine)
             return df
         except Exception as e:
-            st.error(f"Error fetching data: {e}")
+            st.error(f"Error fetching child_list: {e}")
             return pd.DataFrame()
 
-    st.set_page_config(page_title="User List Viewer", layout="wide")
+    def fetch_event_list():
+        try:
+            query = "SELECT * FROM event_list"
+            df = pd.read_sql(query, engine)
+            return df
+        except Exception as e:
+            st.error(f"Error fetching event_list: {e}")
+            return pd.DataFrame()
+
+    st.set_page_config(page_title="Data Viewer", layout="wide")
+
     st.title("User List Table")
-
     user_df = fetch_user_list()
-
     if not user_df.empty:
         st.dataframe(user_df, use_container_width=True)
     else:
         st.warning("No data found in the user_list table.")
 
-    st.set_page_config(page_title="Child List Viewer", layout="wide")
     st.title("Child List Table")
-
     child_df = fetch_child_list()
-
     if not child_df.empty:
         st.dataframe(child_df, use_container_width=True)
     else:
         st.warning("No data found in the child_list table.")
+
+    st.title("Event List Table")
+    event_df = fetch_event_list()
+    if not event_df.empty:
+        st.dataframe(event_df, use_container_width=True)
+    else:
+        st.warning("No data found in the event_list table.")
