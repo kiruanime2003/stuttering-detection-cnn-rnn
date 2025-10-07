@@ -40,21 +40,21 @@ def render():
 
     st.set_page_config(page_title="Data Viewer", layout="wide")
 
-    st.title("User List Table")
+    st.title("User List")
     user_df = fetch_user_list()
     if not user_df.empty:
         st.dataframe(user_df, use_container_width=True)
     else:
         st.warning("No data found in the user_list table.")
 
-    st.title("Child List Table")
+    st.title("Child List")
     child_df = fetch_child_list()
     if not child_df.empty:
         st.dataframe(child_df, use_container_width=True)
     else:
         st.warning("No data found in the child_list table.")
 
-    st.title("Event List Table")
+    st.title("Event List")
     event_df = fetch_event_list()
     if not event_df.empty:
         st.dataframe(event_df, use_container_width=True)
